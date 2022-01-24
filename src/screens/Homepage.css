@@ -1,0 +1,16 @@
+body{
+    background-color: whitesmoke;
+}
+
+#thumb-image{
+    width:70%
+}
+
+#thumb-image-two{
+    width:95%
+}
+
+#image-container{
+    display: flex;
+    justify-content: center;
+}
