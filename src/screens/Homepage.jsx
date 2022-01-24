@@ -3,12 +3,14 @@ import Css from './Homepage.css'
 import {RecaptchaVerifier,getAuth,signInWithPhoneNumber} from 'firebase/auth'
 import { app } from '../firebase';
 import Swal from 'sweetalert2';
+import Overlay from './Overlay';
+
 
 const Homepage = () =>{
     const[sentOtp,setSent]=useState(false)
     const[phone,setPhone]=useState("")
     const[otp,setOtp]=useState("")
-
+    const[sending,setSending]=useState(false)
     const auth = getAuth(app)
 
     const generateRecaptcha = () =>{
@@ -21,6 +23,7 @@ const Homepage = () =>{
     }
 
     const requestOtp = (e) =>{
+        setSending(true)
         e.preventDefault()
         generateRecaptcha()
         let appVerifier = window.recaptchaVerifier
@@ -28,8 +31,10 @@ const Homepage = () =>{
         .then(confirmationResult=>{
             window.confirmationResult = confirmationResult
             setSent(true)
+            setSending(false)
         })
         .catch(err=>{
+            setSending(false)
             if(err.message==="Firebase: Error (auth/too-many-requests)."){
                 new Swal({
                     title:"Maximum limit reached",
@@ -75,6 +80,10 @@ const Homepage = () =>{
 
     return(
         !sentOtp?
+        <>
+        {
+            sending?<Overlay/>:""
+        }
         <div className='container'>
             <div className='row'>
                 <div className='col-lg-4'>&nbsp;</div>
@@ -96,6 +105,7 @@ const Homepage = () =>{
                 <div className='col-lg-4'>&nbsp;</div>
             </div>
         </div>
+        </>
         :
         <div className='container'>
         <div className='row'>
@@ -110,6 +120,7 @@ const Homepage = () =>{
                         <input value={otp} onChange={e=>setOtp(e.target.value)} type="text" className='form-control py-2 mt-4' placeholder='Your OTP here'/>
                         <button onClick={()=>verifyOtp()} className='form-control mt-3' style={{"backgroundColor":"#F38C74","color":'white'}}>Verify OTP</button>
                     </div>
+                    <div onClick={()=>window.location.reload()} className='text-center mt-3'><i className='px-2 fas fa-arrow-left'></i> Go back</div>
                 </div>
             </div>
             <div className='col-lg-4'>&nbsp;</div>
